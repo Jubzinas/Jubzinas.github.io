@@ -9,7 +9,7 @@ Reinforcement Learning is a technique that permits an agent to learn from the en
 It is very similar to a kid that is trying to learn how to play a game, without reading instructions. He learns how to play by actually playing the game and every time he makes a mistake and the game restarts he actually get smarter.
 An agent that is using reinforcement learning is doing the exact same thing.
 
-![Alt text](/assets/rl-intro.png)
+![Alt text](/images/rl-intro.png)
 
 
 
