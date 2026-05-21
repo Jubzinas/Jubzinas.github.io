@@ -5,23 +5,40 @@ draft: false
 tags: ["AI", "RL"]
 ---
 
-Reinforcement Learning is a technique that permits an agent to learn from the environment by interacting with it, without any external instruction.
-It is very similar to a kid that is trying to learn how to play a game, without reading instructions. He learns how to play by actually playing the game and every time he makes a mistake and the game restarts he actually get smarter.
-An agent that is using reinforcement learning is doing the exact same thing.
+Reinforcement Learning is a technique that allows an agent to learn from 
+the environment by interacting with it, without any external instruction.
+It is very similar to a kid trying to learn how to play a game without 
+reading the instructions. He learns by actually playing, and every time 
+he makes a mistake and the game restarts, he gets a little smarter.
+An agent using Reinforcement Learning does the exact same thing.
 
-![Reinforcement Learning](/images/rl_intro.png)
+<!--more-->
 
+<img src="/images/rl_intro1.png" alt="Reinforcement Learning" style="width:100%; max-width:800px; display:block; margin: 20px auto;">
 
+The difference is that the agent has a huge memory and can interact with 
+multiple environments in parallel, learning from all of them at a much 
+higher speed. As a result, agents trained via Reinforcement Learning can 
+beat human players at games such as Chess and Go.
 
-The difference is that the agent has a huge memory and can interact with multiple environments in parallel (and learning from all of them) with a speed way more high.
-The result is that agents trained via reinforcement learning can beat players at games such as chess and go. 
+## How the System Works
 
-The system is set in the same way:
-We have an agent, an environment, a set of actions that the agent can do, an observation that the agent receive from the environment at each step and a reward that the agent receive from the environment at each step.
+The system is composed of five elements:
+- An **agent**
+- An **environment**
+- A set of **actions** the agent can perform
+- An **observation** the agent receives from the environment at each step
+- A **reward** the agent receives from the environment at each step
 
-So the agent gets 2 elements from the environment: a state (if it is not the ful environment it is called observation) and a reward.
-Based on the state the agent can decide which action to do from the set of actions that he owns.
-Each action lead to a new state and a specific reward.
-At the beginning the agents does not know anything about the environment so do not know which reward and state to expect, base on its action.
+At each step, the agent receives two things from the environment: a 
+**state** (called an observation when the agent cannot see the full 
+environment) and a **reward**. Based on the state, the agent decides 
+which action to take. Each action leads to a new state and a specific 
+reward.
 
-The goal of the agent is to maximize the expected return, so the sum of all the expected rewards.
+At the beginning, the agent knows nothing about the environment, so it 
+has no idea which reward or state to expect based on its actions.
+
+The goal of the agent is to maximize the **expected return** — the sum 
+of all future rewards, typically weighted by a discount factor so that 
+immediate rewards are valued more than distant ones.
