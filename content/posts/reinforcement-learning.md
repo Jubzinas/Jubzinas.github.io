@@ -1,12 +1,18 @@
 ---
-title: "Reinforcement Learning"
+title: "Reinforcement Learning Introduction"
 date: 2026-05-20
 draft: false
 tags: ["AI", "RL"]
 ---
-Reinforcement Learning is a techique that permits an agent to learn from the environment by interacting with it, with no external instruction.
-It is like a kid that is trying to learn how to play a game, without reading instructions by trial and error. He understand how to play and learn every time it restarts the game.
+
+Reinforcement Learning is a technique that permits an agent to learn from the environment by interacting with it, without any external instruction.
+It is very similar to a kid that is trying to learn how to play a game, without reading instructions. He learns how to play by actually playing the game and every time he makes a mistake and the game restarts he actually get smarter.
 An agent that is using reinforcement learning is doing the exact same thing.
+
+![Alt text](/assets/rl-intro.png)
+
+
+
 The difference is that the agent has a huge memory and can interact with multiple environments in parallel (and learning from all of them) with a speed way more high.
 The result is that agents trained via reinforcement learning can beat players at games such as chess and go. 
 
