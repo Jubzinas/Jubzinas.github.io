@@ -6,10 +6,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="noindex, nofollow">
-<title>My New Hugo Project</title>
+<title>Jubzinas | AI &amp; Blockchain</title>
 
-<meta name="description" content="">
-<meta name="author" content="">
+<meta name="description" content="Articles on AI, Reinforcement Learning, and Blockchain">
+<meta name="author" content="Giorgio Rosolia">
 <link rel="canonical" href="http://localhost:1313/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
@@ -67,12 +67,25 @@
     }
 
 </script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ],
+    throwOnError: false
+  })">
+</script>
+
+
 </head>
 <body class="list" id="top">
     <header class="header">
     <nav class="header-nav">
         <div class="logo">
-            <a href="http://localhost:1313/" accesskey="h" title="My New Hugo Project (Alt + H)">My New Hugo Project</a>
+            <a href="http://localhost:1313/" accesskey="h" title="Jubzinas | AI &amp; Blockchain (Alt + H)">Jubzinas | AI &amp; Blockchain</a>
             <div class="logo-switches">
                 <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
                     <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
@@ -97,34 +110,111 @@
             </div>
         </div>
         <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
         </ul>
     </nav>
 </header>
 <main class="main"> 
+<article class="first-entry home-info">
+    <header class="entry-header">
+        <h1>Hi, I&rsquo;m Giorgio 👋</h1>
+    </header>
+    <div class="entry-content md-content">
+        
+        <p>I write about AI, Reinforcement Learning, and Blockchain projects.</p>
 
-<article class="first-entry"> 
+    </div>
+    <footer class="entry-footer">
+        <div class="social-icons" >
+    <a href="https://github.com/Jubzinas" target="_blank" rel="noopener noreferrer me"
+        title="Github">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+    </a>
+</div>
+
+    </footer>
+</article>
+
+<article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Intro to Reinforcement Learning
-      <span class="entry-hint" title="Draft">
-        <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" fill="currentColor">
-          <path
-            d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
-        </svg>
-      </span>
+    <h2 class="entry-hint-parent">Policy Networks: Learning to Act Directly
     </h2>
   </header>
   <div class="entry-content">
-    <p></p>
+    <p>Unlike Q-Learning, which learns the value of actions and then derives a policy, a policy network learns the policy directly. In other words, instead of asking “how good is this action in this state?”, it asks “what action should I take right now?”
+That makes policy gradients especially useful when the action space is small but the optimal behavior depends on long-term consequences that are hard to encode with a table of values.
+...</p>
   </div>
   <footer class="entry-footer">
 
-<span title='2026-05-18 22:18:04 +0200 CEST'>May 18, 2026</span></footer>
-  <a class="entry-link" aria-label="post link to Intro to Reinforcement Learning" href="http://localhost:1313/posts/intro-to-reinforcement-learning/"></a>
+<span title='2026-05-30 00:00:00 +0000 UTC'>May 30, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>Giorgio Rosolia</span></footer>
+  <a class="entry-link" aria-label="post link to Policy Networks: Learning to Act Directly" href="http://localhost:1313/posts/policy-network/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Deep Q-Learning: Scaling RL to the Real World
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Tabular Q-Learning is elegant — but it breaks down fast. As soon as the environment grows beyond a few hundred states, the Q-Table becomes impossibly large to store and too slow to converge. A game like Breakout, played from raw pixels, has an astronomically large state space: no table could ever hold it.
+Deep Q-Learning (DQN) solves this by replacing the Q-Table with a neural network. Instead of looking up a value in a table, the network approximates the Q-function — taking a state as input and outputting Q-values for every action in one forward pass.
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-05-26 00:00:00 +0000 UTC'>May 26, 2026</span>&nbsp;·&nbsp;<span>8 min</span>&nbsp;·&nbsp;<span>Giorgio Rosolia</span></footer>
+  <a class="entry-link" aria-label="post link to Deep Q-Learning: Scaling RL to the Real World" href="http://localhost:1313/posts/deep-q-learning/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Q-Learning: Teaching Machines to Make Decisions
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Q-Learning is one of the most fundamental algorithms in Reinforcement Learning. It allows an agent to learn the optimal strategy for navigating an environment purely through trial and error — no model of the world required.
+Think of it like a traveler exploring a city without a map. Every time they find a shortcut or hit a dead end, they update their mental notes. Over time, those notes become a reliable guide to reaching any destination as efficiently as possible.
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-05-26 00:00:00 +0000 UTC'>May 26, 2026</span>&nbsp;·&nbsp;<span>9 min</span>&nbsp;·&nbsp;<span>Giorgio Rosolia</span></footer>
+  <a class="entry-link" aria-label="post link to Q-Learning: Teaching Machines to Make Decisions" href="http://localhost:1313/posts/q-learning/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Reinforcement Learning Introduction
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Reinforcement Learning is a technique that allows an agent to learn from the environment by interacting with it, without any external instruction. It is very similar to a kid trying to learn how to play a game without reading the instructions. The kid learns by actually playing, and every time he makes a mistake and the game restarts, he gets a little smarter. An agent using Reinforcement Learning does the exact same thing — but faster.
+...</p>
+  </div>
+  <footer class="entry-footer">
+
+<span title='2026-05-20 00:00:00 +0000 UTC'>May 20, 2026</span>&nbsp;·&nbsp;<span>3 min</span>&nbsp;·&nbsp;<span>Giorgio Rosolia</span></footer>
+  <a class="entry-link" aria-label="post link to Reinforcement Learning Introduction" href="http://localhost:1313/posts/reinforcement-learning/"></a>
 </article>
     </main>
     
 <footer class="footer">
-        <span>&copy; 2026 <a href="http://localhost:1313/">My New Hugo Project</a></span> · 
+        <span>&copy; 2026 <a href="http://localhost:1313/">Jubzinas | AI &amp; Blockchain</a></span> · 
 
     
     

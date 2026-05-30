@@ -1,19 +1,63 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>My New Hugo Project</title>
+    <title>Jubzinas | AI &amp; Blockchain</title>
     <link>http://localhost:1313/</link>
-    <description>Recent content on My New Hugo Project</description>
+    <description>Recent content on Jubzinas | AI &amp; Blockchain</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 18 May 2026 22:18:04 +0200</lastBuildDate>
+    <lastBuildDate>Sat, 30 May 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Intro to Reinforcement Learning</title>
-      <link>http://localhost:1313/posts/intro-to-reinforcement-learning/</link>
-      <pubDate>Mon, 18 May 2026 22:18:04 +0200</pubDate>
-      <guid>http://localhost:1313/posts/intro-to-reinforcement-learning/</guid>
-      <description></description>
+      <title>Policy Networks: Learning to Act Directly</title>
+      <link>http://localhost:1313/posts/policy-network/</link>
+      <pubDate>Sat, 30 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/policy-network/</guid>
+      <description>&lt;p&gt;Unlike Q-Learning, which learns the value of actions and then derives a policy,
+a &lt;strong&gt;policy network&lt;/strong&gt; learns the policy directly. In other words, instead of asking
+&lt;em&gt;“how good is this action in this state?”&lt;/em&gt;, it asks &lt;em&gt;“what action should I take
+right now?”&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;That makes policy gradients especially useful when the action space is small but
+the optimal behavior depends on long-term consequences that are hard to encode
+with a table of values.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Deep Q-Learning: Scaling RL to the Real World</title>
+      <link>http://localhost:1313/posts/deep-q-learning/</link>
+      <pubDate>Tue, 26 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/deep-q-learning/</guid>
+      <description>&lt;p&gt;Tabular Q-Learning is elegant — but it breaks down fast. As soon as the
+environment grows beyond a few hundred states, the Q-Table becomes impossibly
+large to store and too slow to converge. A game like Breakout, played from
+raw pixels, has an astronomically large state space: no table could ever hold it.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Deep Q-Learning (DQN)&lt;/strong&gt; solves this by replacing the Q-Table with a
+&lt;strong&gt;neural network&lt;/strong&gt;. Instead of looking up a value in a table, the network
+&lt;em&gt;approximates&lt;/em&gt; the Q-function — taking a state as input and outputting
+Q-values for every action in one forward pass.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Q-Learning: Teaching Machines to Make Decisions</title>
+      <link>http://localhost:1313/posts/q-learning/</link>
+      <pubDate>Tue, 26 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/q-learning/</guid>
+      <description>&lt;p&gt;Q-Learning is one of the most fundamental algorithms in Reinforcement Learning.
+It allows an agent to learn the optimal strategy for navigating an environment
+purely through trial and error — no model of the world required.&lt;/p&gt;
+&lt;p&gt;Think of it like a traveler exploring a city without a map. Every time they find
+a shortcut or hit a dead end, they update their mental notes. Over time, those
+notes become a reliable guide to reaching any destination as efficiently as possible.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Reinforcement Learning Introduction</title>
+      <link>http://localhost:1313/posts/reinforcement-learning/</link>
+      <pubDate>Wed, 20 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/reinforcement-learning/</guid>
+      <description>&lt;p&gt;Reinforcement Learning is a technique that allows an agent to learn from
+the environment by interacting with it, without any external instruction.
+It is very similar to a kid trying to learn how to play a game without
+reading the instructions. The kid learns by actually playing, and every time
+he makes a mistake and the game restarts, he gets a little smarter.
+An agent using Reinforcement Learning does the exact same thing — but faster.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

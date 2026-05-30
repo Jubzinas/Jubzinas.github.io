@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Q-Learning: Teaching Machines to Make Decisions | Jubzinas | AI &amp; Blockchain</title>
+<meta name="keywords" content="AI, RL, Q-Learning">
+<meta name="description" content="Q-Learning is one of the most fundamental algorithms in Reinforcement Learning.
+It allows an agent to learn the optimal strategy for navigating an environment
+purely through trial and error — no model of the world required.
+Think of it like a traveler exploring a city without a map. Every time they find
+a shortcut or hit a dead end, they update their mental notes. Over time, those
+notes become a reliable guide to reaching any destination as efficiently as possible.">
+<meta name="author" content="Giorgio Rosolia">
+<link rel="canonical" href="http://localhost:1313/posts/q-learning/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/q-learning/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ],
+    throwOnError: false
+  })">
+</script>
+
+
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Jubzinas | AI &amp; Blockchain (Alt + H)">Jubzinas | AI &amp; Blockchain</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Q-Learning: Teaching Machines to Make Decisions
+    </h1>
+    <div class="post-meta">
+
+<span title='2026-05-26 00:00:00 +0000 UTC'>May 26, 2026</span>&nbsp;·&nbsp;<span>9 min</span>&nbsp;·&nbsp;<span>Giorgio Rosolia</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><p>Q-Learning is one of the most fundamental algorithms in Reinforcement Learning.
+It allows an agent to learn the optimal strategy for navigating an environment
+purely through trial and error — no model of the world required.</p>
+<p>Think of it like a traveler exploring a city without a map. Every time they find
+a shortcut or hit a dead end, they update their mental notes. Over time, those
+notes become a reliable guide to reaching any destination as efficiently as possible.</p>
+<p>It belongs to a specific family of RL methods — and understanding <em>where</em> it sits
+in that family helps understand why it works the way it does.</p>
+<figure style="text-align:center; margin: 28px 0;">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Reinforcement_learning_diagram.svg"
+       alt="Reinforcement Learning agent-environment loop"
+       style="max-width:520px; width:100%; background:#fff; padding:12px; border-radius:8px;">
+  <figcaption style="margin-top:8px; font-size:0.9em; color:#888;">The RL loop: the agent observes a state, takes an action, and receives a reward from the environment.</figcaption>
+</figure>
+<hr>
+<h2 id="q-learning-is-a-value-based-method">Q-Learning is a Value-Based Method<a hidden class="anchor" aria-hidden="true" href="#q-learning-is-a-value-based-method">#</a></h2>
+<p>Reinforcement Learning algorithms can be broadly split into two families:</p>
+<ul>
+<li><strong>Policy-based</strong> methods directly learn a function that maps states to actions.</li>
+<li><strong>Value-based</strong> methods instead learn to estimate <em>how good</em> each situation is,
+and derive the policy from those estimates.</li>
+</ul>
+<p>Q-Learning is <strong>value-based</strong>. It never explicitly stores a policy. Instead, it
+learns a <strong>value function</strong> — and the policy is implicit: always pick the action
+with the highest value.</p>
+<hr>
+<h2 id="the-q-table-shape-and-meaning">The Q-Table: Shape and Meaning<a hidden class="anchor" aria-hidden="true" href="#the-q-table-shape-and-meaning">#</a></h2>
+<p>At the heart of Q-Learning is the <strong>Q-Table</strong>, a 2D matrix with a precise structure:</p>
+$$Q \in \mathbb{R}^{|\mathcal{S}| \times |\mathcal{A}|}$$<ul>
+<li><strong>Rows</strong> → every possible <strong>state</strong> $s \in \mathcal{S}$</li>
+<li><strong>Columns</strong> → every possible <strong>action</strong> $a \in \mathcal{A}$</li>
+<li><strong>Each cell</strong> $Q(s, a)$ → the estimated <strong>total future reward</strong> the agent
+expects to collect, starting from state $s$, taking action $a$, and then
+following the best possible policy from that point onward.</li>
+</ul>
+<p>For example, in the <strong>Taxi</strong> environment there are 500 possible states and
+6 possible actions, so the Q-Table has shape <strong>500 × 6 = 3,000 values</strong> to learn.
+In <strong>FrozenLake</strong> (8×8 grid), it&rsquo;s <strong>64 × 4 = 256 values</strong>.</p>
+<p>Initially every cell is set to zero — the agent knows nothing. The entire
+learning process is about filling these cells with increasingly accurate estimates.</p>
+<p>To make it concrete, here is what a small converged Q-Table looks like for a 4-state GridWorld with 4 actions:</p>
+<table>
+  <thead>
+      <tr>
+          <th>State</th>
+          <th>← Left</th>
+          <th>↓ Down</th>
+          <th>→ Right</th>
+          <th>↑ Up</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>S (start)</td>
+          <td>0.31</td>
+          <td>0.48</td>
+          <td><strong>0.72</strong></td>
+          <td>0.19</td>
+      </tr>
+      <tr>
+          <td>State 1</td>
+          <td>−0.10</td>
+          <td><strong>0.65</strong></td>
+          <td>0.41</td>
+          <td>−0.05</td>
+      </tr>
+      <tr>
+          <td>State 2</td>
+          <td>−0.20</td>
+          <td>0.12</td>
+          <td><strong>0.80</strong></td>
+          <td>0.22</td>
+      </tr>
+      <tr>
+          <td>G (goal)</td>
+          <td>0.00</td>
+          <td>0.00</td>
+          <td>0.00</td>
+          <td>0.00</td>
+      </tr>
+  </tbody>
+</table>
+<p>The <strong>bold</strong> value in each row is the action the agent will take — that is the implicit policy.</p>
+<hr>
+<h2 id="what-exactly-is-a-q-value">What Exactly Is a Q-Value?<a hidden class="anchor" aria-hidden="true" href="#what-exactly-is-a-q-value">#</a></h2>
+<p>The Q-value $Q(s, a)$ is not just the next immediate reward. It is the
+<strong>expected discounted return</strong> — the sum of all future rewards the agent will
+collect from this moment onward, with rewards further in the future discounted
+by a factor $\gamma$:</p>
+$$Q(s, a) = \mathbb{E} \left[ \sum_{t=0}^{\infty} \gamma^t \, r_{t+1} \;\bigg|\; s_0 = s,\, a_0 = a \right]$$<p>The discount factor $\gamma \in [0, 1]$ controls how far-sighted the agent is:</p>
+<ul>
+<li>$\gamma = 0$: the agent only cares about the immediate reward.</li>
+<li>$\gamma \to 1$: the agent treats near and distant rewards almost equally.</li>
+<li>A typical value like $\gamma = 0.99$ means a reward 100 steps away is still
+worth about $0.99^{100} \approx 37\%$ of a reward received now.</li>
+</ul>
+<p>This is what separates Q-Learning from a simple reflex agent — it plans ahead.</p>
+<hr>
+<h2 id="how-q-learning-learns-temporal-difference">How Q-Learning Learns: Temporal Difference<a hidden class="anchor" aria-hidden="true" href="#how-q-learning-learns-temporal-difference">#</a></h2>
+<p>Q-Learning belongs to the <strong>Temporal Difference (TD)</strong> family of learning methods.
+The key idea of TD learning is: <strong>don&rsquo;t wait until the end of an episode to update</strong>.
+Instead, update after <em>every single step</em>, using the very next observation as a
+bootstrapped estimate of the future.</p>
+<p>After taking action $a$ from state $s$, the agent:</p>
+<ol>
+<li>Receives immediate reward $r$</li>
+<li>Lands in next state $s'$</li>
+<li>Looks up the best Q-value it currently knows for $s'$: $\max_{a'} Q(s', a')$</li>
+<li>Constructs a <strong>TD target</strong> — a better estimate of what $Q(s, a)$ should be:</li>
+</ol>
+$$\text{TD target} = r + \gamma \max_{a'} Q(s', a')$$<p>This target combines the <em>real</em> reward just received with the <em>current best guess</em>
+of future value. The difference between this target and the current estimate is
+called the <strong>TD error</strong>:</p>
+$$\delta = \underbrace{r + \gamma \max_{a'} Q(s', a')}_{\text{TD target}} - \underbrace{Q(s, a)}_{\text{current estimate}}$$<p>A large $\delta$ means the agent was surprised — its current estimate was far off.
+A small $\delta$ means it already had a good estimate of that state-action pair.</p>
+<figure style="text-align:center; margin: 24px 0;">
+  <img src="https://gymnasium.farama.org/_images/frozen_lake.gif"
+       alt="FrozenLake Q-Learning agent navigating the grid"
+       style="max-width:360px; width:100%; border-radius:8px; image-rendering:pixelated;">
+  <figcaption style="margin-top:8px; font-size:0.9em; color:#888;">A trained Q-Learning agent navigating FrozenLake. After thousands of TD updates, the Q-Table has converged enough to guide the agent safely from S to G. — <em>Source: <a href="https://gymnasium.farama.org/environments/toy_text/frozen_lake/" target="_blank">Gymnasium — FrozenLake-v1</a></em></figcaption>
+</figure>
+<hr>
+<h2 id="the-bellman-equation-and-the-update-rule">The Bellman Equation and the Update Rule<a hidden class="anchor" aria-hidden="true" href="#the-bellman-equation-and-the-update-rule">#</a></h2>
+<p>The update rule of Q-Learning is rooted in the <strong>Bellman Optimality Equation</strong>,
+which expresses a fundamental recursive truth: <em>the value of a state is equal to
+the best immediate reward you can get, plus the discounted value of the best
+next state you can reach.</em></p>
+$$Q^*(s, a) = r(s, a) + \gamma \max_{a'} Q^*(s', a')$$<p>This is not just a formula — it&rsquo;s a <em>consistency condition</em>. If the Q-values are
+truly optimal ($Q^*$), this equation must hold for every state-action pair.
+Q-Learning exploits this: it repeatedly nudges the current estimates toward
+satisfying it, using the update rule:</p>
+$$Q(s, a) \leftarrow Q(s, a) + \alpha \cdot \delta$$<p>Expanded in full:</p>
+$$Q(s, a) \leftarrow Q(s, a) + \alpha \left[ r + \gamma \max_{a'} Q(s', a') - Q(s, a) \right]$$<p>Let&rsquo;s break down every component:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Symbol</th>
+          <th>Name</th>
+          <th>Role</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>$Q(s, a)$</td>
+          <td>Current Q-value</td>
+          <td>Our existing estimate for this state-action pair</td>
+      </tr>
+      <tr>
+          <td>$\alpha \in (0,1]$</td>
+          <td>Learning rate</td>
+          <td>Step size of the update — how aggressively we revise the estimate</td>
+      </tr>
+      <tr>
+          <td>$r$</td>
+          <td>Immediate reward</td>
+          <td>The real signal received from the environment after action $a$</td>
+      </tr>
+      <tr>
+          <td>$\gamma \in [0,1)$</td>
+          <td>Discount factor</td>
+          <td>How much future rewards are worth relative to immediate ones</td>
+      </tr>
+      <tr>
+          <td>$s'$</td>
+          <td>Next state</td>
+          <td>The state the environment transitioned to after the action</td>
+      </tr>
+      <tr>
+          <td>$\max_{a'} Q(s', a')$</td>
+          <td>Best future value</td>
+          <td>The highest Q-value in the next state — our bootstrapped future estimate</td>
+      </tr>
+      <tr>
+          <td>$\delta$</td>
+          <td>TD error</td>
+          <td>The gap between what we expected and what we now believe is correct</td>
+      </tr>
+  </tbody>
+</table>
+<p>The learning rate $\alpha$ controls how large a correction we make:</p>
+<ul>
+<li>$\alpha = 1$: fully replace the old estimate with the new target (aggressive).</li>
+<li>$\alpha \to 0$: barely update at all (very conservative).</li>
+<li>In practice values like $0.1$ work well — we nudge the estimate a little each step.</li>
+</ul>
+<p>Over thousands of steps, these small corrections accumulate until $Q(s,a)$
+converges to $Q^*(s,a)$ — the true optimal value — for every state-action pair.</p>
+<hr>
+<h2 id="exploration-vs-exploitation">Exploration vs. Exploitation<a hidden class="anchor" aria-hidden="true" href="#exploration-vs-exploitation">#</a></h2>
+<p>A key challenge in Q-Learning is deciding when to <strong>explore</strong> (try new actions)
+and when to <strong>exploit</strong> (use what&rsquo;s already learned). This is managed through
+the <strong>ε-greedy policy</strong>:</p>
+<ul>
+<li>With probability <strong>ε</strong>: pick a <strong>random action</strong> (explore)</li>
+<li>With probability <strong>1 - ε</strong>: pick the <strong>best known action</strong> (exploit)</li>
+</ul>
+<p>Early in training, ε is kept high so the agent explores broadly.
+Over time, ε is gradually reduced — the agent shifts toward exploiting
+the knowledge it has accumulated.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Phase</th>
+          <th>ε value</th>
+          <th>Behavior</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Start of training</td>
+          <td>≈ 1.0</td>
+          <td>Almost always picks a <strong>random action</strong> — full exploration</td>
+      </tr>
+      <tr>
+          <td>Mid training</td>
+          <td>≈ 0.5</td>
+          <td>Mix of random and greedy choices</td>
+      </tr>
+      <tr>
+          <td>End of training</td>
+          <td>≈ 0.0001</td>
+          <td>Almost always picks the <strong>best known action</strong> — full exploitation</td>
+      </tr>
+  </tbody>
+</table>
+<p>ε decays linearly over training. This schedule ensures the agent sees diverse situations early on before committing to the policy it has learned.</p>
+<hr>
+<h2 id="a-simple-example-gridworld">A Simple Example: GridWorld<a hidden class="anchor" aria-hidden="true" href="#a-simple-example-gridworld">#</a></h2>
+<p>Imagine a 4×4 grid. The agent starts at the top-left corner and must reach
+a goal in the bottom-right corner, avoiding a pit in the middle.</p>
+<pre tabindex="0"><code>S . . .
+. . X .
+. . . .
+. . . G
+</code></pre><ul>
+<li><code>S</code> = Start, <code>G</code> = Goal, <code>X</code> = Pit (negative reward)</li>
+</ul>
+<p>At each step, the agent can move <strong>up, down, left, or right</strong>.
+It receives:</p>
+<ul>
+<li><code>+10</code> for reaching the goal</li>
+<li><code>-10</code> for falling into the pit</li>
+<li><code>-1</code> for every other step (to encourage efficiency)</li>
+</ul>
+<p>After thousands of episodes, the Q-Table will have converged to values that
+guide the agent along the optimal path from any cell on the grid.</p>
+<hr>
+<h2 id="limitations-of-q-learning">Limitations of Q-Learning<a hidden class="anchor" aria-hidden="true" href="#limitations-of-q-learning">#</a></h2>
+<p>Q-Learning works well for small, discrete environments — but it has real limits:</p>
+<ul>
+<li><strong>Scalability</strong>: The Q-Table grows with every new state and action.
+For complex environments (like video games), it becomes unmanageable.</li>
+<li><strong>Continuous spaces</strong>: Q-Learning can&rsquo;t handle continuous state or action spaces
+without discretization, which introduces approximation errors.</li>
+</ul>
+<p>These limitations led to the development of <strong>Deep Q-Networks (DQN)</strong>, where
+a neural network replaces the Q-Table — enabling Q-Learning to scale to
+environments like Atari games with raw pixel input.</p>
+<hr>
+<h2 id="practical-implementation-two-environments">Practical Implementation: Two Environments<a hidden class="anchor" aria-hidden="true" href="#practical-implementation-two-environments">#</a></h2>
+<p>To see Q-Learning in action, I tested it on two classic <a href="https://gymnasium.farama.org/">Gymnasium</a>
+environments in <a href="https://github.com/Jubzinas/Q-learning">this repository</a>.
+Both agents learn purely from scratch using epsilon-greedy exploration
+and are periodically evaluated during training.</p>
+<hr>
+<h3 id="-frozenlake">🧊 FrozenLake<a hidden class="anchor" aria-hidden="true" href="#-frozenlake">#</a></h3>
+<p>The agent navigates an <strong>8×8 frozen grid</strong> from the start tile (S) to the goal (G),
+avoiding holes (H). A random map is generated each run, and the environment
+supports both slippery and non-slippery modes.</p>
+<ul>
+<li><strong>State space</strong>: 64 discrete positions</li>
+<li><strong>Action space</strong>: 4 (Left, Down, Right, Up)</li>
+<li><strong>Reward</strong>: +1 for reaching the goal, 0 otherwise</li>
+<li><strong>Metric tracked</strong>: Success rate (% of episodes reaching the goal)</li>
+</ul>
+<div style="display:flex; gap:16px; justify-content:center; text-align:center; margin: 20px 0;">
+  <figure>
+    <img class="gif-loop" src="https://raw.githubusercontent.com/Jubzinas/Q-learning/main/assets/frozen_lake_pretrained.gif" alt="FrozenLake untrained" style="max-width:300px; width:100%;">
+    <figcaption>Before Training</figcaption>
+  </figure>
+  <figure>
+    <img class="gif-loop" src="https://raw.githubusercontent.com/Jubzinas/Q-learning/main/assets/frozen_lake_trained.gif" alt="FrozenLake trained" style="max-width:300px; width:100%;">
+    <figcaption>After Training</figcaption>
+  </figure>
+</div>
+<p>The untrained agent stumbles randomly and almost always falls into a hole.
+After training, it reliably finds a safe path to the goal.</p>
+<hr>
+<h3 id="-taxi">🚕 Taxi<a hidden class="anchor" aria-hidden="true" href="#-taxi">#</a></h3>
+<p>The agent drives a taxi on a <strong>5×5 grid</strong>, picking up a passenger and dropping
+them off at the correct destination.</p>
+<ul>
+<li><strong>State space</strong>: 500 discrete states (taxi position × passenger location × destination)</li>
+<li><strong>Action space</strong>: 6 (South, North, East, West, Pickup, Dropoff)</li>
+<li><strong>Reward</strong>: +20 for a correct dropoff, −1 per step, −10 for illegal actions</li>
+<li><strong>Metric tracked</strong>: Mean reward per evaluation episode</li>
+</ul>
+<div style="display:flex; gap:16px; justify-content:center; text-align:center; margin: 20px 0;">
+  <figure>
+    <img class="gif-loop" src="https://raw.githubusercontent.com/Jubzinas/Q-learning/main/assets/taxi_pretrained.gif" alt="Taxi untrained" style="max-width:300px; width:100%;">
+    <figcaption>Before Training</figcaption>
+  </figure>
+  <figure>
+    <img class="gif-loop" src="https://raw.githubusercontent.com/Jubzinas/Q-learning/main/assets/taxi_trained.gif" alt="Taxi trained" style="max-width:300px; width:100%;">
+    <figcaption>After Training</figcaption>
+  </figure>
+</div>
+<p>Before training the agent makes random illegal moves and ignores the passenger.
+After training it navigates directly to the pickup, then to the correct dropoff location.</p>
+<hr>
+<h3 id="hyperparameters-used">Hyperparameters used<a hidden class="anchor" aria-hidden="true" href="#hyperparameters-used">#</a></h3>
+<p>Both agents were trained with the following configuration:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Hyperparameter</th>
+          <th>Value</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Learning rate (α)</td>
+          <td>0.1</td>
+      </tr>
+      <tr>
+          <td>Discount factor (γ)</td>
+          <td>0.99</td>
+      </tr>
+      <tr>
+          <td>Min epsilon</td>
+          <td>1e-4</td>
+      </tr>
+      <tr>
+          <td>Max steps per episode</td>
+          <td>200</td>
+      </tr>
+  </tbody>
+</table>
+<p>Epsilon decays linearly from 1.0 to <code>min_epsilon</code> over all training episodes.</p>
+<blockquote>
+<p>The full source code, setup instructions, and auto-generated GIFs are available
+in the <a href="https://github.com/Jubzinas/Q-learning">GitHub repository</a>.</p>
+</blockquote>
+<hr>
+<h2 id="summary">Summary<a hidden class="anchor" aria-hidden="true" href="#summary">#</a></h2>
+<p>Q-Learning is an elegant algorithm that:</p>
+<ol>
+<li>Maintains a table of state-action values</li>
+<li>Updates them using the Bellman equation after each step</li>
+<li>Balances exploration and exploitation with ε-greedy</li>
+<li>Converges to the optimal policy given enough time and exploration</li>
+</ol>
+<p>It laid the groundwork for modern deep reinforcement learning and remains
+one of the most important ideas in the field.</p>
+<script>
+(function() {
+  function restartGifs() {
+    document.querySelectorAll('img.gif-loop').forEach(function(img) {
+      var src = img.src.split('?')[0];
+      img.src = src + '?t=' + Date.now();
+    });
+  }
+  // Restart every 6 seconds — adjust to match your GIF duration
+  setInterval(restartGifs, 6000);
+})();
+</script>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/ai/">AI</a></li>
+      <li><a href="http://localhost:1313/tags/rl/">RL</a></li>
+      <li><a href="http://localhost:1313/tags/q-learning/">Q-Learning</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/reinforcement-learning/">
+    <span class="title">« Prev</span>
+    <span>Reinforcement Learning Introduction</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/deep-q-learning/">
+    <span class="title">Next »</span>
+    <span>Deep Q-Learning: Scaling RL to the Real World</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">Jubzinas | AI &amp; Blockchain</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

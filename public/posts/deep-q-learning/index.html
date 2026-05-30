@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Deep Q-Learning: Scaling RL to the Real World | Jubzinas | AI &amp; Blockchain</title>
+<meta name="keywords" content="AI, RL, DQN, Deep Learning">
+<meta name="description" content="Tabular Q-Learning is elegant — but it breaks down fast. As soon as the
+environment grows beyond a few hundred states, the Q-Table becomes impossibly
+large to store and too slow to converge. A game like Breakout, played from
+raw pixels, has an astronomically large state space: no table could ever hold it.
+Deep Q-Learning (DQN) solves this by replacing the Q-Table with a
+neural network. Instead of looking up a value in a table, the network
+approximates the Q-function — taking a state as input and outputting
+Q-values for every action in one forward pass.">
+<meta name="author" content="Giorgio Rosolia">
+<link rel="canonical" href="http://localhost:1313/posts/deep-q-learning/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.cd9298b33628769aa1bc1acebbbfd7aa11ce81dfe03484d479e1907760249a1d.css" integrity="sha256-zZKYszYodpqhvBrOu7/XqhHOgd/gNITUeeGQd2Akmh0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/deep-q-learning/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ],
+    throwOnError: false
+  })">
+</script>
+
+
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Jubzinas | AI &amp; Blockchain (Alt + H)">Jubzinas | AI &amp; Blockchain</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Deep Q-Learning: Scaling RL to the Real World
+    </h1>
+    <div class="post-meta">
+
+<span title='2026-05-26 00:00:00 +0000 UTC'>May 26, 2026</span>&nbsp;·&nbsp;<span>8 min</span>&nbsp;·&nbsp;<span>Giorgio Rosolia</span>
+
+</div>
+  </header> 
+  <div class="post-content md-content"><p>Tabular Q-Learning is elegant — but it breaks down fast. As soon as the
+environment grows beyond a few hundred states, the Q-Table becomes impossibly
+large to store and too slow to converge. A game like Breakout, played from
+raw pixels, has an astronomically large state space: no table could ever hold it.</p>
+<p><strong>Deep Q-Learning (DQN)</strong> solves this by replacing the Q-Table with a
+<strong>neural network</strong>. Instead of looking up a value in a table, the network
+<em>approximates</em> the Q-function — taking a state as input and outputting
+Q-values for every action in one forward pass.</p>
+$$Q_\theta(s, a) \approx Q^*(s, a)$$<p>The weights $\theta$ of the network are learned through gradient descent,
+exactly like any other supervised learning problem — except the targets are
+themselves computed from the network&rsquo;s own predictions.</p>
+<hr>
+<h2 id="why-a-convolutional-neural-network">Why a Convolutional Neural Network?<a hidden class="anchor" aria-hidden="true" href="#why-a-convolutional-neural-network">#</a></h2>
+<p>For Atari games, the input to the agent is a <strong>grayscale image</strong> of the screen —
+84×84 pixels, stacked across 4 consecutive frames to give the network a
+sense of motion. This means the input tensor has shape <strong>4 × 84 × 84</strong>.</p>
+<p>A plain fully-connected network would need to learn from every individual pixel
+independently — no sense of spatial structure, no parameter sharing, millions
+of weights. A <strong>Convolutional Neural Network (CNN)</strong> is a far better fit.</p>
+<h3 id="what-is-a-convolutional-layer">What Is a Convolutional Layer?<a hidden class="anchor" aria-hidden="true" href="#what-is-a-convolutional-layer">#</a></h3>
+<p>A convolutional layer applies a set of small <strong>filters</strong> (also called kernels)
+across the entire input image. Each filter slides over the image from left to
+right, top to bottom, computing an <strong>element-wise multiplication</strong> between its
+weights and the local patch of pixels underneath it. The sum of this operation
+produces a single output pixel. Repeating this across the whole image produces
+one <strong>output channel</strong> — also called a <strong>feature map</strong>.</p>
+$$\text{output}[i, j] = \sum_{m}\sum_{n} \text{input}[i \cdot s + m,\; j \cdot s + n] \cdot \text{kernel}[m, n]$$<p>where $s$ is the <strong>stride</strong> — how many pixels the filter shifts at each step.</p>
+<figure style="text-align:center; margin: 24px 0;">
+  <img src="https://miro.medium.com/v2/resize:fit:1320/format:webp/1*LT0l-KXw5FXIkcGVl-KXlQ.gif"
+       alt="Convolution kernel sliding over input" style="max-width:500px; width:100%; border-radius:8px;">
+  <figcaption style="margin-top:8px; font-size:0.9em; color:#888;">A 3×3 kernel sliding over a 9×9 input (stride 1). Each position computes one output pixel via element-wise multiply + sum. <em>Source: <a href="https://medium.com/data-science/conv2d-to-finally-understand-what-happens-in-the-forward-pass-1bbaafb0b148" target="_blank">Axel Thevenot</a></em></figcaption>
+</figure>
+<p>A few key parameters control how a convolutional layer behaves
+(as explained in depth by <a href="https://medium.com/data-science/conv2d-to-finally-understand-what-happens-in-the-forward-pass-1bbaafb0b148">Axel Thevenot</a>):</p>
+<table>
+  <thead>
+      <tr>
+          <th>Parameter</th>
+          <th>What it controls</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Kernel size</strong></td>
+          <td>The spatial extent of the filter (e.g. 8×8, 4×4, 3×3). Larger kernels see more context but cost more compute.</td>
+      </tr>
+      <tr>
+          <td><strong>Stride</strong></td>
+          <td>How far the filter jumps between positions. A stride of 4 reduces output size by 4× — useful for downsampling.</td>
+      </tr>
+      <tr>
+          <td><strong>Number of filters</strong></td>
+          <td>Each filter learns a different feature (edges, curves, textures). More filters = more expressive, more parameters.</td>
+      </tr>
+      <tr>
+          <td><strong>Padding</strong></td>
+          <td>Zero-pixels added around the input border to preserve spatial size.</td>
+      </tr>
+  </tbody>
+</table>
+<div style="display:flex; gap:20px; justify-content:center; flex-wrap:wrap; margin: 24px 0;">
+  <figure style="text-align:center; flex:1; min-width:220px; max-width:340px;">
+    <img src="https://miro.medium.com/v2/resize:fit:1400/format:webp/1*ubRrYAZJUlCcqg7WoKjLgQ.gif"
+         alt="Multi-channel convolution" style="width:100%; border-radius:8px;">
+    <figcaption style="font-size:0.85em; color:#888; margin-top:6px;">Multiple filters on a 3-channel input → each output channel detects a different feature. <em>Source: <a href="https://medium.com/data-science/conv2d-to-finally-understand-what-happens-in-the-forward-pass-1bbaafb0b148" target="_blank">Axel Thevenot</a></em></figcaption>
+  </figure>
+  <figure style="text-align:center; flex:1; min-width:220px; max-width:340px;">
+    <img src="https://miro.medium.com/v2/resize:fit:1400/format:webp/1*o9-Rq3QUC8IzTMfAJIbhLA.gif"
+         alt="Stride convolution" style="width:100%; border-radius:8px;">
+    <figcaption style="font-size:0.85em; color:#888; margin-top:6px;">A large stride (e.g. 4 in Conv1) skips positions, aggressively downsampling the spatial size. <em>Source: <a href="https://medium.com/data-science/conv2d-to-finally-understand-what-happens-in-the-forward-pass-1bbaafb0b148" target="_blank">Axel Thevenot</a></em></figcaption>
+  </figure>
+</div>
+<p>Each filter learns to detect a specific <strong>visual pattern</strong>. Early layers detect
+edges and corners; deeper layers compose those into higher-level features
+like shapes and objects. The network figures out which patterns are most useful
+for predicting game outcomes entirely on its own.</p>
+<h3 id="output-size-formula">Output size formula<a hidden class="anchor" aria-hidden="true" href="#output-size-formula">#</a></h3>
+<p>Given an input of height $H$, kernel size $K$, padding $P$, and stride $S$:</p>
+$$H_{\text{out}} = \left\lfloor \frac{H + 2P - K}{S} \right\rfloor + 1$$<hr>
+<h2 id="the-nature-dqn-architecture">The Nature DQN Architecture<a hidden class="anchor" aria-hidden="true" href="#the-nature-dqn-architecture">#</a></h2>
+<p>The architecture used here is the original one from the DeepMind Nature paper
+(Mnih et al., 2015). It processes the 4-frame stack through three convolutional
+layers that progressively compress the spatial information into abstract features,
+then feeds the result into two fully-connected layers that output one Q-value
+per action.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Layer</th>
+          <th>Specification</th>
+          <th>Output shape</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Input</strong></td>
+          <td>4 stacked grayscale frames ÷ 255</td>
+          <td>4 × 84 × 84</td>
+      </tr>
+      <tr>
+          <td><strong>Conv1</strong></td>
+          <td>32 filters, 8×8 kernel, stride 4, ReLU</td>
+          <td>32 × 20 × 20</td>
+      </tr>
+      <tr>
+          <td><strong>Conv2</strong></td>
+          <td>64 filters, 4×4 kernel, stride 2, ReLU</td>
+          <td>64 × 9 × 9</td>
+      </tr>
+      <tr>
+          <td><strong>Conv3</strong></td>
+          <td>64 filters, 3×3 kernel, stride 1, ReLU</td>
+          <td>64 × 7 × 7</td>
+      </tr>
+      <tr>
+          <td><strong>Flatten</strong></td>
+          <td>64 × 7 × 7 = 3136 values</td>
+          <td>3136</td>
+      </tr>
+      <tr>
+          <td><strong>FC1</strong></td>
+          <td>3136 → 512, ReLU</td>
+          <td>512</td>
+      </tr>
+      <tr>
+          <td><strong>FC2</strong></td>
+          <td>512 → n_actions</td>
+          <td>n_actions</td>
+      </tr>
+  </tbody>
+</table>
+<p>After Conv3 the spatial maps are flattened into a single vector of <strong>3136 values</strong>
+and fed into the fully-connected head. The final layer outputs one Q-value
+per action — in Breakout, that&rsquo;s 4 values (no-op, fire, left, right).</p>
+<hr>
+<h2 id="key-innovations-over-tabular-q-learning">Key Innovations Over Tabular Q-Learning<a hidden class="anchor" aria-hidden="true" href="#key-innovations-over-tabular-q-learning">#</a></h2>
+<p>Replacing the table with a network introduces instability — the network&rsquo;s own
+outputs are used to compute the training targets. DQN solves this with two
+critical tricks:</p>
+<h3 id="1-experience-replay">1. Experience Replay<a hidden class="anchor" aria-hidden="true" href="#1-experience-replay">#</a></h3>
+<p>Instead of learning from each transition immediately and discarding it, every
+$(s, a, r, s')$ tuple is stored in a <strong>replay buffer</strong> (size 300,000 here).
+At each training step, a random <strong>mini-batch of 32</strong> transitions is sampled
+from the buffer.</p>
+<p>This breaks the temporal correlation between consecutive samples — without it,
+the network would overfit to whatever the agent is currently doing and quickly
+diverge.</p>
+<h3 id="2-target-network">2. Target Network<a hidden class="anchor" aria-hidden="true" href="#2-target-network">#</a></h3>
+<p>A second copy of the Q-network — the <strong>target network</strong> — is kept frozen and
+used to compute the TD targets:</p>
+$$y = r + \gamma \max_{a'} Q_{\text{target}}(s', a')$$<p>The target network&rsquo;s weights are synced to the online network every
+<strong>1,000 steps</strong> (a hard copy, $\tau = 1.0$). This stabilises training by
+preventing the targets from shifting at every gradient step.</p>
+<hr>
+<h2 id="training-with-temporal-difference">Training with Temporal Difference<a hidden class="anchor" aria-hidden="true" href="#training-with-temporal-difference">#</a></h2>
+<p>The network is trained to minimise the <strong>mean squared TD error</strong> between its
+predictions and the targets:</p>
+$$\mathcal{L}(\theta) = \mathbb{E}\left[\left(y - Q_\theta(s, a)\right)^2\right]$$$$y = r + \gamma \max_{a'} Q_{\text{target}}(s', a')$$<p>Gradients are backpropagated through the online network only — not through the
+target. The optimizer used is <strong>Adam</strong> with learning rate $10^{-4}$.</p>
+<hr>
+<h2 id="exploration-ε-greedy-with-linear-decay">Exploration: ε-Greedy with Linear Decay<a hidden class="anchor" aria-hidden="true" href="#exploration-ε-greedy-with-linear-decay">#</a></h2>
+<p>Just like tabular Q-Learning, DQN uses ε-greedy exploration — but the schedule
+matters more here because the network needs many diverse experiences early on
+to avoid collapsing to a suboptimal policy.</p>
+<ul>
+<li><strong>Start</strong>: ε = 1.0 (fully random for the first 5,000 steps, before any training begins)</li>
+<li><strong>End</strong>: ε = 0.01 (nearly fully greedy)</li>
+<li><strong>Decay</strong>: linear over the first <strong>10% of total timesteps</strong></li>
+</ul>
+<hr>
+<h2 id="atari-preprocessing">Atari Preprocessing<a hidden class="anchor" aria-hidden="true" href="#atari-preprocessing">#</a></h2>
+<p>Raw Atari frames are 210×160 RGB images at 60fps — far too large and redundant
+to train on directly. DeepMind&rsquo;s preprocessing pipeline reduces them to a compact,
+informative representation:</p>
+<ol>
+<li><strong>Grayscale</strong> — color carries little information for game strategy.</li>
+<li><strong>Resize to 84×84</strong> — standardised input size across all games.</li>
+<li><strong>Frame stacking (4 frames)</strong> — gives the network temporal context:
+it can infer velocity of the ball, direction of movement, etc.</li>
+<li><strong>Frame skip (4)</strong> — the agent repeats each chosen action for 4 frames,
+reducing computational cost and making the control problem easier.</li>
+<li><strong>Normalise to [0, 1]</strong> — divide pixel values by 255.</li>
+</ol>
+<figure style="text-align:center; margin: 24px 0;">
+  <img src="https://huggingface.co/datasets/huggingface-deep-rl-course/course-images/resolve/main/en/unit4/preprocessing.jpg"
+       alt="Atari preprocessing pipeline: grayscale, resize, frame stacking"
+       style="max-width:620px; width:100%; border-radius:8px;">
+  <figcaption style="margin-top:8px; font-size:0.9em; color:#888;">The full DeepMind preprocessing pipeline: raw RGB frame → grayscale → 84×84 → stacked across 4 timesteps → 4×84×84 tensor fed to the CNN. — <em>Source: <a href="https://huggingface.co/learn/deep-rl-course/unit4/deep-q-network" target="_blank">Hugging Face Deep RL Course</a></em></figcaption>
+</figure>
+<hr>
+<h2 id="practical-implementation-atari-breakout">Practical Implementation: Atari Breakout<a hidden class="anchor" aria-hidden="true" href="#practical-implementation-atari-breakout">#</a></h2>
+<p>I tested this implementation on <code>ALE/Breakout-v5</code> in <a href="https://github.com/Jubzinas/Deep-Q-Learning">this repository</a>,
+training for <strong>5 million steps</strong> on a standard machine.</p>
+<figure style="text-align:center; margin: 24px 0;">
+  <img src="https://huggingface.co/datasets/huggingface-deep-rl-course/course-images/resolve/main/en/unit4/deep-q-network.jpg"
+       alt="Deep Q-Network architecture: CNN + fully connected layers"
+       style="max-width:660px; width:100%; border-radius:8px;">
+  <figcaption style="margin-top:8px; font-size:0.9em; color:#888;">The Nature DQN architecture: the stacked frames pass through 3 conv layers that extract spatial features, then 2 FC layers that output one Q-value per action. — <em>Source: <a href="https://huggingface.co/learn/deep-rl-course/unit4/deep-q-network" target="_blank">Hugging Face Deep RL Course</a>, based on Mnih et al. 2015</em></figcaption>
+</figure>
+<p>The model implements the original Nature DQN with:</p>
+<ul>
+<li>CNN Q-network (3 conv layers + 2 FC layers)</li>
+<li>Experience replay buffer (300,000 transitions)</li>
+<li>Hard target network updates every 1,000 steps</li>
+<li>ε-greedy with linear decay</li>
+<li>Multi-environment rollouts (2 parallel envs)</li>
+<li>Periodic evaluation with video recording</li>
+</ul>
+<h3 id="before-training-random-policy">Before Training (random policy)<a hidden class="anchor" aria-hidden="true" href="#before-training-random-policy">#</a></h3>
+<p>The agent takes random actions, scores close to 0, and loses lives immediately.</p>
+<div style="display:flex; justify-content:center; margin: 20px 0;">
+  <figure style="text-align:center;">
+    <img class="gif-loop" src="https://raw.githubusercontent.com/Jubzinas/Deep-Q-Learning/main/assets/before_training.gif" alt="Before training" style="max-width:480px; width:100%;">
+    <figcaption>Before Training — random policy</figcaption>
+  </figure>
+</div>
+<h3 id="after-5m-steps">After 5M Steps<a hidden class="anchor" aria-hidden="true" href="#after-5m-steps">#</a></h3>
+<p>The agent has learned to aim the ball and systematically clear rows — showing
+clearly purposeful, non-random behavior.</p>
+<div style="display:flex; justify-content:center; margin: 20px 0;">
+  <figure style="text-align:center;">
+    <img class="gif-loop" src="https://raw.githubusercontent.com/Jubzinas/Deep-Q-Learning/main/assets/after_training.gif" alt="After 5M steps" style="max-width:480px; width:100%;">
+    <figcaption>After 5M Steps — learned policy</figcaption>
+  </figure>
+</div>
+<blockquote>
+<p>Note: the original DeepMind paper trained for <strong>50 million frames</strong> to reach
+expert-level performance (scores of 400+). At 5M steps the agent is clearly
+learning but is still in an intermediate stage. To reproduce strong results,
+set <code>--total_timesteps 50000000</code> and use a GPU.</p>
+</blockquote>
+<hr>
+<h3 id="hyperparameters">Hyperparameters<a hidden class="anchor" aria-hidden="true" href="#hyperparameters">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Parameter</th>
+          <th>Value</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Environment</td>
+          <td><code>ALE/Breakout-v5</code></td>
+      </tr>
+      <tr>
+          <td>Total timesteps</td>
+          <td>5,000,000</td>
+      </tr>
+      <tr>
+          <td>Learning rate</td>
+          <td>1e-4</td>
+      </tr>
+      <tr>
+          <td>Optimizer</td>
+          <td>Adam</td>
+      </tr>
+      <tr>
+          <td>Parallel envs</td>
+          <td>2</td>
+      </tr>
+      <tr>
+          <td>Replay buffer size</td>
+          <td>300,000</td>
+      </tr>
+      <tr>
+          <td>Batch size</td>
+          <td>32</td>
+      </tr>
+      <tr>
+          <td>Discount factor (γ)</td>
+          <td>0.99</td>
+      </tr>
+      <tr>
+          <td>Target network update</td>
+          <td>every 1,000 steps (hard copy)</td>
+      </tr>
+      <tr>
+          <td>Training starts after</td>
+          <td>5,000 steps</td>
+      </tr>
+      <tr>
+          <td>Train frequency</td>
+          <td>every 4 steps</td>
+      </tr>
+      <tr>
+          <td>ε start → end</td>
+          <td>1.0 → 0.01</td>
+      </tr>
+      <tr>
+          <td>Exploration fraction</td>
+          <td>10% of timesteps</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p>Full source code, setup instructions, and pretrained weights are available in
+the <a href="https://github.com/Jubzinas/Deep-Q-Learning">GitHub repository</a>.</p>
+</blockquote>
+<hr>
+<h2 id="from-q-learning-to-dqn-what-changed">From Q-Learning to DQN: What Changed<a hidden class="anchor" aria-hidden="true" href="#from-q-learning-to-dqn-what-changed">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>Tabular Q-Learning</th>
+          <th>Deep Q-Learning</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>State representation</strong></td>
+          <td>Discrete index</td>
+          <td>Raw pixels (tensor)</td>
+      </tr>
+      <tr>
+          <td><strong>Q-function</strong></td>
+          <td>Lookup table</td>
+          <td>Neural network</td>
+      </tr>
+      <tr>
+          <td><strong>Scalability</strong></td>
+          <td>Breaks at ~1000 states</td>
+          <td>Scales to millions</td>
+      </tr>
+      <tr>
+          <td><strong>Learning signal</strong></td>
+          <td>TD error per step</td>
+          <td>Batched MSE loss</td>
+      </tr>
+      <tr>
+          <td><strong>Stability tricks</strong></td>
+          <td>None needed</td>
+          <td>Replay buffer + target network</td>
+      </tr>
+      <tr>
+          <td><strong>Training</strong></td>
+          <td>Single update per step</td>
+          <td>Mini-batch gradient descent</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="summary">Summary<a hidden class="anchor" aria-hidden="true" href="#summary">#</a></h2>
+<p>Deep Q-Learning extends tabular Q-Learning to high-dimensional, visual environments by:</p>
+<ol>
+<li>Replacing the Q-Table with a <strong>CNN</strong> that approximates $Q^*(s, a)$</li>
+<li>Using an <strong>experience replay buffer</strong> to break temporal correlations</li>
+<li>Stabilising training with a <strong>frozen target network</strong></li>
+<li>Processing raw pixels through <strong>DeepMind&rsquo;s Atari preprocessing pipeline</strong></li>
+</ol>
+<p>It was the first algorithm to demonstrate human-level performance across a broad
+range of Atari games from raw pixel input — a landmark result published in
+Nature in 2015 by Mnih et al.</p>
+<script>
+(function() {
+  function restartGifs() {
+    document.querySelectorAll('img.gif-loop').forEach(function(img) {
+      var src = img.src.split('?')[0];
+      img.src = src + '?t=' + Date.now();
+    });
+  }
+  setInterval(restartGifs, 8000);
+})();
+</script>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/ai/">AI</a></li>
+      <li><a href="http://localhost:1313/tags/rl/">RL</a></li>
+      <li><a href="http://localhost:1313/tags/dqn/">DQN</a></li>
+      <li><a href="http://localhost:1313/tags/deep-learning/">Deep Learning</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/q-learning/">
+    <span class="title">« Prev</span>
+    <span>Q-Learning: Teaching Machines to Make Decisions</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/policy-network/">
+    <span class="title">Next »</span>
+    <span>Policy Networks: Learning to Act Directly</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">Jubzinas | AI &amp; Blockchain</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

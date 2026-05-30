@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Q-Learning on Jubzinas | AI &amp; Blockchain</title>
+    <link>http://localhost:1313/tags/q-learning/</link>
+    <description>Recent content in Q-Learning on Jubzinas | AI &amp; Blockchain</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 26 May 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/q-learning/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Q-Learning: Teaching Machines to Make Decisions</title>
+      <link>http://localhost:1313/posts/q-learning/</link>
+      <pubDate>Tue, 26 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/q-learning/</guid>
+      <description>&lt;p&gt;Q-Learning is one of the most fundamental algorithms in Reinforcement Learning.
+It allows an agent to learn the optimal strategy for navigating an environment
+purely through trial and error — no model of the world required.&lt;/p&gt;
+&lt;p&gt;Think of it like a traveler exploring a city without a map. Every time they find
+a shortcut or hit a dead end, they update their mental notes. Over time, those
+notes become a reliable guide to reaching any destination as efficiently as possible.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

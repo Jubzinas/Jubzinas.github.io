@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Policy Gradient on Jubzinas | AI &amp; Blockchain</title>
+    <link>http://localhost:1313/tags/policy-gradient/</link>
+    <description>Recent content in Policy Gradient on Jubzinas | AI &amp; Blockchain</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 30 May 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/policy-gradient/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Policy Networks: Learning to Act Directly</title>
+      <link>http://localhost:1313/posts/policy-network/</link>
+      <pubDate>Sat, 30 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/policy-network/</guid>
+      <description>&lt;p&gt;Unlike Q-Learning, which learns the value of actions and then derives a policy,
+a &lt;strong&gt;policy network&lt;/strong&gt; learns the policy directly. In other words, instead of asking
+&lt;em&gt;“how good is this action in this state?”&lt;/em&gt;, it asks &lt;em&gt;“what action should I take
+right now?”&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;That makes policy gradients especially useful when the action space is small but
+the optimal behavior depends on long-term consequences that are hard to encode
+with a table of values.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

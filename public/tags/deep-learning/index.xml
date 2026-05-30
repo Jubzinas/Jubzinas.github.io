@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Deep Learning on Jubzinas | AI &amp; Blockchain</title>
+    <link>http://localhost:1313/tags/deep-learning/</link>
+    <description>Recent content in Deep Learning on Jubzinas | AI &amp; Blockchain</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 26 May 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/deep-learning/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Deep Q-Learning: Scaling RL to the Real World</title>
+      <link>http://localhost:1313/posts/deep-q-learning/</link>
+      <pubDate>Tue, 26 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/deep-q-learning/</guid>
+      <description>&lt;p&gt;Tabular Q-Learning is elegant — but it breaks down fast. As soon as the
+environment grows beyond a few hundred states, the Q-Table becomes impossibly
+large to store and too slow to converge. A game like Breakout, played from
+raw pixels, has an astronomically large state space: no table could ever hold it.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Deep Q-Learning (DQN)&lt;/strong&gt; solves this by replacing the Q-Table with a
+&lt;strong&gt;neural network&lt;/strong&gt;. Instead of looking up a value in a table, the network
+&lt;em&gt;approximates&lt;/em&gt; the Q-function — taking a state as input and outputting
+Q-values for every action in one forward pass.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

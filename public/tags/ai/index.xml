@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>AI on Jubzinas | AI &amp; Blockchain</title>
+    <link>http://localhost:1313/tags/ai/</link>
+    <description>Recent content in AI on Jubzinas | AI &amp; Blockchain</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 20 May 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/ai/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Reinforcement Learning Introduction</title>
+      <link>http://localhost:1313/posts/reinforcement-learning/</link>
+      <pubDate>Wed, 20 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/reinforcement-learning/</guid>
+      <description>&lt;p&gt;Reinforcement Learning is a technique that allows an agent to learn from
+the environment by interacting with it, without any external instruction.
+It is very similar to a kid trying to learn how to play a game without
+reading the instructions. The kid learns by actually playing, and every time
+he makes a mistake and the game restarts, he gets a little smarter.
+An agent using Reinforcement Learning does the exact same thing — but faster.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

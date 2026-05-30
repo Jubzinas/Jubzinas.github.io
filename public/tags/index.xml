@@ -1,11 +1,61 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Tags on My New Hugo Project</title>
+    <title>Tags on Jubzinas | AI &amp; Blockchain</title>
     <link>http://localhost:1313/tags/</link>
-    <description>Recent content in Tags on My New Hugo Project</description>
+    <description>Recent content in Tags on Jubzinas | AI &amp; Blockchain</description>
     <generator>Hugo</generator>
     <language>en-us</language>
+    <lastBuildDate>Sat, 30 May 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>AI</title>
+      <link>http://localhost:1313/tags/ai/</link>
+      <pubDate>Sat, 30 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/ai/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Policy Gradient</title>
+      <link>http://localhost:1313/tags/policy-gradient/</link>
+      <pubDate>Sat, 30 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/policy-gradient/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>REINFORCE</title>
+      <link>http://localhost:1313/tags/reinforce/</link>
+      <pubDate>Sat, 30 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/reinforce/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>RL</title>
+      <link>http://localhost:1313/tags/rl/</link>
+      <pubDate>Sat, 30 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/rl/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Deep Learning</title>
+      <link>http://localhost:1313/tags/deep-learning/</link>
+      <pubDate>Tue, 26 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/deep-learning/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>DQN</title>
+      <link>http://localhost:1313/tags/dqn/</link>
+      <pubDate>Tue, 26 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/dqn/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Q-Learning</title>
+      <link>http://localhost:1313/tags/q-learning/</link>
+      <pubDate>Tue, 26 May 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/q-learning/</guid>
+      <description></description>
+    </item>
   </channel>
 </rss>
