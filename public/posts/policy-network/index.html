@@ -137,7 +137,7 @@ with a table of values.">
     </h1>
     <div class="post-meta">
 
-<span title='2026-05-30 00:00:00 +0000 UTC'>May 30, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>Giorgio Rosolia</span>
+<span title='2026-05-30 00:00:00 +0000 UTC'>May 30, 2026</span>&nbsp;·&nbsp;<span>7 min</span>&nbsp;·&nbsp;<span>Giorgio Rosolia</span>
 
 </div>
   </header> 
@@ -166,7 +166,9 @@ actions during training, which encourages exploration.</p>
 <li>A final layer that outputs <strong>action logits</strong></li>
 <li>A <strong>softmax</strong> that turns logits into action probabilities</li>
 </ol>
-$$\pi_\theta(a \mid s) = \text{softmax}(f_\theta(s))$$<hr>
+$$\pi_\theta(a \mid s) = \text{softmax}(f_\theta(s))$$<p><img alt="The RL agent-environment loop" loading="lazy" src="https://spinningup.openai.com/en/latest/_images/rl_diagram_transparent_bg.png">
+<em>The standard RL loop: the agent observes a state, selects an action via its policy, receives a reward, and transitions to a new state. In policy-based methods the policy $\pi_\theta$ is the direct output of a neural network. (<a href="https://spinningup.openai.com/en/latest/spinningup/rl_intro.html">Source: OpenAI Spinning Up</a>)</em></p>
+<hr>
 <h2 id="why-use-a-policy-network">Why Use a Policy Network?<a hidden class="anchor" aria-hidden="true" href="#why-use-a-policy-network">#</a></h2>
 <p>Policy networks are useful when:</p>
 <ul>
@@ -177,23 +179,95 @@ $$\pi_\theta(a \mid s) = \text{softmax}(f_\theta(s))$$<hr>
 </ul>
 <p>Instead of building a Q-table, the network learns parameters that map states
 straight to action probabilities.</p>
+<p><img alt="RL Algorithm Taxonomy" loading="lazy" src="https://spinningup.openai.com/en/latest/_images/rl_algorithms_9_15.svg">
+<em>A map of modern RL algorithms. REINFORCE belongs to the policy gradient family (right branch), which optimises the policy directly rather than estimating value functions first. (<a href="https://spinningup.openai.com/en/latest/spinningup/rl_intro2.html">Source: OpenAI Spinning Up</a>)</em></p>
 <hr>
 <h2 id="reinforce-the-core-idea">REINFORCE: The Core Idea<a hidden class="anchor" aria-hidden="true" href="#reinforce-the-core-idea">#</a></h2>
-<p>REINFORCE is a Monte Carlo policy gradient method. It waits until an episode
-(or rollout) is finished, computes the return, and then updates the policy so
-that actions that led to good outcomes become more likely.</p>
-<p>The objective is to maximize expected return:</p>
-$$J(\theta) = \mathbb{E}[G]$$<p>where $G$ is the total discounted reward.</p>
-<p>The policy gradient theorem gives the update direction:</p>
-$$\nabla_\theta J(\theta) = \mathbb{E}\left[ \nabla_\theta \log \pi_\theta(a_t \mid s_t)\, G_t \right]$$<p>In practice, this means:</p>
+<p>REINFORCE is a <strong>Monte Carlo policy gradient</strong> method. The name comes directly
+from the classic Williams (1992) paper — in practice we just think of it as:
+run a full episode, measure how good it was, then push the policy parameters
+in the direction that makes that outcome more likely.</p>
+<h3 id="1-the-objective">1. The Objective<a hidden class="anchor" aria-hidden="true" href="#1-the-objective">#</a></h3>
+<p>We want a policy $\pi_\theta$ that maximises the expected cumulative reward:</p>
+$$J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}\left[ \sum_{t=0}^{T} \gamma^t r_t \right]$$<p>where $\tau = (s_0, a_0, r_0, s_1, \ldots)$ is a full episode trajectory
+sampled by following $\pi_\theta$, and $\gamma \in [0,1]$ is the discount factor.</p>
+<h3 id="2-the-policy-gradient-theorem">2. The Policy Gradient Theorem<a hidden class="anchor" aria-hidden="true" href="#2-the-policy-gradient-theorem">#</a></h3>
+<p>We need $\nabla_\theta J(\theta)$ to improve $\theta$, but the expectation is
+over trajectories that themselves depend on $\theta$ — so we cannot just
+differentiate the rewards directly.</p>
+<p>The <strong>Policy Gradient Theorem</strong> (Sutton et al., 2000) solves this.
+Using the <strong>log-derivative trick</strong>:</p>
+$$\nabla_\theta \pi_\theta(a \mid s) = \pi_\theta(a \mid s)\; \nabla_\theta \log \pi_\theta(a \mid s)$$<p>the gradient of the objective becomes an expectation we can estimate from
+sampled episodes:</p>
+$$\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}\left[ \sum_{t=0}^{T} \nabla_\theta \log \pi_\theta(a_t \mid s_t)\; G_t \right]$$<p>where $G_t$ is the <strong>discounted return from step $t$</strong>:</p>
+$$G_t = \sum_{k=0}^{T-t} \gamma^k\, r_{t+k}$$<p>This is the total reward actually received from step $t$ onward, with future
+rewards discounted — computed <strong>after</strong> the episode ends.</p>
+<h3 id="3-intuition-what-does-this-formula-say">3. Intuition: What Does This Formula Say?<a hidden class="anchor" aria-hidden="true" href="#3-intuition-what-does-this-formula-say">#</a></h3>
+<p>Break the gradient update into two parts:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Term</th>
+          <th>Meaning</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>$\nabla_\theta \log \pi_\theta(a_t \mid s_t)$</td>
+          <td>Direction in parameter space that makes action $a_t$ more likely in state $s_t$</td>
+      </tr>
+      <tr>
+          <td>$G_t$</td>
+          <td>How good was the outcome that followed?</td>
+      </tr>
+  </tbody>
+</table>
+<p>The product of the two gives:</p>
 <ul>
-<li>if an action leads to a good return, increase its probability</li>
-<li>if an action leads to a bad return, decrease its probability</li>
+<li><strong>Large $G_t$</strong> — take a big step towards making $a_t$ more probable</li>
+<li><strong>Small or negative $G_t$</strong> — take a small or reversed step, making $a_t$ less probable</li>
 </ul>
-<p>A common training loss is the negative of that objective:</p>
-$$\mathcal{L}(\theta) = -\log \pi_\theta(a_t \mid s_t) \cdot G_t$$<p>This is why policy gradients are often described as learning by
-“reinforcing actions that worked.”</p>
-<hr>
+<p>This is exactly the trial-and-error logic: if what you did worked out,
+do it more often; if it did not, do it less.</p>
+<h3 id="4-why-the-loss-is-the-negative-of-the-objective">4. Why the Loss Is the Negative of the Objective<a hidden class="anchor" aria-hidden="true" href="#4-why-the-loss-is-the-negative-of-the-objective">#</a></h3>
+<p>Neural network optimizers (SGD, Adam, &hellip;) <strong>minimize</strong> a scalar loss.
+Our objective $J(\theta)$ is something we want to <strong>maximize</strong>.</p>
+<p>The standard trick is to flip the sign and define the loss as:</p>
+$$\mathcal{L}(\theta) = -\,\mathbb{E}\left[ \sum_{t=0}^{T} \log \pi_\theta(a_t \mid s_t)\; G_t \right]$$<p>Minimizing $\mathcal{L}$ is mathematically identical to maximizing $J$:</p>
+$$\text{minimize } \mathcal{L} \iff \text{maximize } J$$<p>because $\nabla_\theta \mathcal{L} = -\nabla_\theta J$, so
+gradient <strong>descent</strong> on $\mathcal{L}$ equals gradient <strong>ascent</strong> on $J$.</p>
+<p>In code this looks like:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># log_probs: list of log pi(a_t | s_t) collected during the episode</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># returns:   list of G_t computed after the episode ends</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>loss <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>torch<span style="color:#f92672">.</span>stack(
+</span></span><span style="display:flex;"><span>    [lp <span style="color:#f92672">*</span> G <span style="color:#66d9ef">for</span> lp, G <span style="color:#f92672">in</span> zip(log_probs, returns)]
+</span></span><span style="display:flex;"><span>)<span style="color:#f92672">.</span>sum()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>optimizer<span style="color:#f92672">.</span>zero_grad()
+</span></span><span style="display:flex;"><span>loss<span style="color:#f92672">.</span>backward()   <span style="color:#75715e"># computes -gradient_J, i.e. the descent direction</span>
+</span></span><span style="display:flex;"><span>optimizer<span style="color:#f92672">.</span>step()  <span style="color:#75715e"># subtracts a small step -&gt; effectively ascends J</span>
+</span></span></code></pre></div><p>The negative sign is the only thing that converts &ldquo;gradient ascent on reward&rdquo;
+into &ldquo;gradient descent on loss&rdquo; — something every deep learning framework
+already knows how to do.</p>
+<h3 id="5-monte-carlo-sampling-and-its-trade-offs">5. Monte Carlo Sampling and Its Trade-offs<a hidden class="anchor" aria-hidden="true" href="#5-monte-carlo-sampling-and-its-trade-offs">#</a></h3>
+<p>REINFORCE is a <em>Monte Carlo</em> method because $G_t$ is estimated from a
+<strong>complete sampled episode</strong>, not from a bootstrapped value as TD-learning
+or Actor-Critic methods do.</p>
+<p>This gives an <strong>unbiased</strong> estimate of the true return, but with <strong>high
+variance</strong>: two runs from the same initial state can yield very different
+$G_t$ values because both the environment and the stochastic policy inject
+randomness at every step.</p>
+<p>Common mitigations are:</p>
+<ul>
+<li><strong>Baseline subtraction</strong>: replace $G_t$ with $G_t - b(s_t)$ where $b$ is a
+learned state-value estimate. This keeps the gradient unbiased while
+reducing variance — the core idea behind Actor-Critic methods.</li>
+<li><strong>Return normalisation</strong>: standardise the returns inside a batch to
+zero mean and unit variance before computing the loss.</li>
+</ul>
+<h2 id="transparent-as-possible-while-still-solving-acrobot">For this project the raw return is used — keeping the implementation as
+transparent as possible while still solving Acrobot.</h2>
 <h2 id="from-logits-to-actions">From Logits to Actions<a hidden class="anchor" aria-hidden="true" href="#from-logits-to-actions">#</a></h2>
 <p>The output of the network is not the action itself — it is a vector of logits.
 Those logits are converted to probabilities using softmax:</p>
@@ -213,6 +287,8 @@ the end effector high enough to reach a target.</p>
 </ul>
 <p>This makes Acrobot a good testbed for policy gradients because success depends
 on sequences of coordinated actions, not just immediate reward.</p>
+<p><img alt="Acrobot-v1 environment" loading="lazy" src="https://gymnasium.farama.org/_images/acrobot.gif">
+<em>The Acrobot-v1 environment: the agent applies torques to the middle joint and must swing the lower link above the horizontal line. Rewards are $-1$ per step until the goal is reached, making long-horizon planning essential. (<a href="https://gymnasium.farama.org/environments/classic_control/acrobot/">Source: Gymnasium documentation</a>)</em></p>
 <hr>
 <h2 id="network-training-loop">Network Training Loop<a hidden class="anchor" aria-hidden="true" href="#network-training-loop">#</a></h2>
 <p>The training loop in <a href="https://github.com/Jubzinas/Policy-Network/blob/main/policy_network.py">policy_network.py</a> follows the standard REINFORCE pattern:</p>
