@@ -1,4 +1,41 @@
 baseURL = "https://jubzinas.github.io/"
-locale = 'en-us'
-title = 'My New Hugo Project'
-theme = 'PaperMod'
+languageCode = "en-us"
+title = "Jubzinas | AI & Blockchain"
+theme = "PaperMod"
+
+[markup.goldmark.renderer]
+  unsafe = true
+
+[markup.goldmark.extensions.passthrough]
+  enable = true
+
+[markup.goldmark.extensions.passthrough.delimiters]
+  block = [["$$", "$$"]]
+  inline = [["$", "$"]]
+
+[params]
+  author = "Giorgio Rosolia"
+  description = "Articles on AI, Reinforcement Learning, and Blockchain"
+  defaultTheme = "auto"
+  ShowReadingTime = true
+  ShowCodeCopyButtons = true
+  ShowPostNavLinks = true
+  math = true
+
+[params.homeInfoParams]
+  Title = "Hi, I'm Giorgio 👋"
+  Content = "I write about AI, Reinforcement Learning, and Blockchain projects."
+
+[[params.socialIcons]]
+  name = "github"
+  url = "https://github.com/Jubzinas"
+
+[menu]
+  [[menu.main]]
+    name = "Posts"
+    url = "/posts/"
+    weight = 1
+  [[menu.main]]
+    name = "Tags"
+    url = "/tags/"
+    weight = 2
